@@ -78,7 +78,7 @@ A complete online service management and booking system built with FastAPI and T
 - pip (Python package manager)
 
 ### Installation Steps
-
+```bash
 # 1. Install dependencies
 pip install -r requirements.txt
 

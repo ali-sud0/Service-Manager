@@ -1,0 +1,332 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - ServiceHub{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-800">Admin Dashboard</h1>
+            <p class="text-slate-500 text-sm mt-1">System overview & analytics</p>
+        </div>
+        <button onclick="downloadAdminReport()" 
+                class="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-purple-700 transition shadow-sm">
+            <i class="fas fa-file-pdf mr-2"></i> Download Report
+        </button>
+    </div>
+
+
+    <!-- Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+        <div class="stat-card">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-slate-500 text-xs uppercase tracking-wide">Total Users</p>
+                    <p class="text-2xl font-bold text-slate-800 mt-1" id="totalUsers">0</p>
+                </div>
+                <div class="stat-icon blue">
+                    <i class="fas fa-users text-xl"></i>
+                </div>
+            </div>
+            <div class="mt-2 text-xs text-slate-500">
+                <span id="customersCount">0</span> Customers · <span id="providersCount">0</span> Providers
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-slate-500 text-xs uppercase tracking-wide">Services</p>
+                    <p class="text-2xl font-bold text-slate-800 mt-1" id="totalServices">0</p>
+                </div>
+                <div class="stat-icon purple">
+                    <i class="fas fa-concierge-bell text-xl"></i>
+                </div>
+            </div>
+            <div class="mt-2 text-xs text-slate-500">
+                <span id="activeServices">0</span> Active · <span id="inactiveServices">0</span> Inactive
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-slate-500 text-xs uppercase tracking-wide">Bookings</p>
+                    <p class="text-2xl font-bold text-slate-800 mt-1" id="totalBookings">0</p>
+                </div>
+                <div class="stat-icon green">
+                    <i class="fas fa-calendar-check text-xl"></i>
+                </div>
+            </div>
+            <div class="mt-2 text-xs text-slate-500">
+                <span id="todayBookings">0</span> Today · <span id="weeklyBookings">0</span> This week
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-slate-500 text-xs uppercase tracking-wide">Revenue</p>
+                    <p class="text-2xl font-bold text-emerald-600 mt-1" id="totalRevenue">$0</p>
+                </div>
+                <div class="stat-icon green">
+                    <i class="fas fa-dollar-sign text-xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+            <h3 class="font-semibold text-slate-800 mb-4">Bookings Overview</h3>
+            <canvas id="bookingsChart" height="200"></canvas>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+            <h3 class="font-semibold text-slate-800 mb-4">Most Booked Services</h3>
+            <div id="mostBookedList" class="space-y-2">
+                <p class="text-slate-400 text-center py-4 text-sm">Loading...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Users Table with Create User Button -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 mb-8">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="font-semibold text-slate-800">User Management</h3>
+            <button onclick="showCreateUserModal()" class="bg-slate-900 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-slate-800 transition">
+                <i class="fas fa-plus mr-1"></i> Create User
+            </button>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                    <tr><td colspan="5" class="text-center py-8 text-slate-400 text-sm">Loading...</td</tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Services Management Table -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 mb-8">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="font-semibold text-slate-800">Services Management</h3>
+            <!-- <button onclick="showCreateServiceModal()" class="bg-slate-900 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-slate-800 transition">
+                <i class="fas fa-plus mr-1"></i> Create Service
+            </button> -->
+        </div>
+        <div class="overflow-x-auto">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Service Name</th>
+                        <th>Provider</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="servicesTableBody">
+                    <tr><td colspan="7" class="text-center py-8 text-slate-400 text-sm">Loading...</td</tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Bookings Table with Force Actions -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+        <h3 class="font-semibold text-slate-800 mb-4">All Bookings</h3>
+        <div class="overflow-x-auto">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Customer</th>
+                        <th>Provider</th>
+                        <th>Service</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="allBookingsBody">
+                    <tr><td colspan="7" class="text-center py-8 text-slate-400 text-sm">Loading...</td</tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Create User Modal -->
+<div id="createUserModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 modal-overlay">
+    <div class="bg-white rounded-xl shadow-xl max-w-md w-full mx-4 modal-content">
+        <div class="p-5">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold text-slate-800">Create New User</h3>
+                <button onclick="closeCreateUserModal()" class="text-slate-400 hover:text-slate-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="createUserForm" class="space-y-3">
+                <input type="text" name="full_name" placeholder="Full Name" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm">
+                <input type="text" name="username" placeholder="Username" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm">
+                <input type="email" name="email" placeholder="Email" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm">
+                <input type="password" name="password" placeholder="Password" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm">
+                <select name="role" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm">
+                    <option value="customer">Customer</option>
+                    <option value="provider">Provider</option>
+                    <option value="admin">Admin</option>
+                </select>
+                <div class="flex gap-3 pt-3">
+                    <button type="submit" class="flex-1 bg-slate-900 text-white py-2 rounded-lg text-sm font-medium">Create</button>
+                    <button type="button" onclick="closeCreateUserModal()" class="flex-1 border border-slate-200 py-2 rounded-lg text-sm">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit User Modal -->
+<div id="editUserModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 modal-overlay">
+    <div class="bg-white rounded-xl shadow-xl max-w-md w-full mx-4 modal-content">
+        <div class="p-5">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold text-slate-800">Edit User</h3>
+                <button onclick="closeEditUserModal()" class="text-slate-400 hover:text-slate-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="editUserForm" class="space-y-3">
+                <input type="hidden" id="editUserId" name="user_id">
+                
+                <input type="text" id="editFullName" name="full_name" placeholder="Full Name" required 
+                       class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm">
+                
+                <input type="text" id="editUsername" name="username" placeholder="Username" required 
+                       class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm">
+                
+                <input type="email" id="editEmail" name="email" placeholder="Email" required 
+                       class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm">
+                
+                <input type="tel" id="editPhone" name="phone" placeholder="Phone Number" 
+                       class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm">
+                
+                <select id="editRole" name="role" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm">
+                    <option value="customer">Customer</option>
+                    <option value="provider">Provider</option>
+                    <option value="admin">Admin</option>
+                </select>
+                
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Status</label>
+                    <select id="editStatus" name="is_active" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm">
+                        <option value="true">Active</option>
+                        <option value="false">Deactive</option>
+                    </select>
+                </div>
+                
+                <div class="flex gap-3 pt-3">
+                    <button type="submit" class="flex-1 bg-slate-900 text-white py-2 rounded-lg text-sm font-medium hover:bg-slate-800 transition">
+                        Save Changes
+                    </button>
+                    <button type="button" onclick="closeEditUserModal()" class="flex-1 border border-slate-200 py-2 rounded-lg text-sm hover:bg-slate-50 transition">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Create Service Modal -->
+<div id="createServiceModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 modal-overlay">
+    <div class="bg-white rounded-xl shadow-xl max-w-md w-full mx-4 modal-content">
+        <div class="p-5">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold text-slate-800">Create New Service</h3>
+                <button onclick="closeCreateServiceModal()" class="text-slate-400 hover:text-slate-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="createServiceForm" class="space-y-3">
+                <input type="text" name="name" placeholder="Service Name" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm">
+                <textarea name="description" rows="3" placeholder="Description" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm"></textarea>
+                <input type="text" name="category" placeholder="Category" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm">
+                <input type="number" name="price" step="0.01" placeholder="Price" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm">
+                <input type="number" name="duration_minutes" placeholder="Duration (minutes)" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm">
+                <div class="flex gap-3 pt-3">
+                    <button type="submit" class="flex-1 bg-slate-900 text-white py-2 rounded-lg text-sm font-medium">Create</button>
+                    <button type="button" onclick="closeCreateServiceModal()" class="flex-1 border border-slate-200 py-2 rounded-lg text-sm">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Service Modal -->
+<div id="editServiceModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 modal-overlay">
+    <div class="bg-white rounded-xl shadow-xl max-w-md w-full mx-4 modal-content">
+        <div class="p-5">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold text-slate-800">Edit Service</h3>
+                <button onclick="closeEditServiceModal()" class="text-slate-400 hover:text-slate-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="editServiceForm" class="space-y-3">
+                <input type="hidden" id="editServiceId" name="service_id">
+                <input type="text" id="editServiceName" name="name" placeholder="Service Name" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm">
+                <textarea id="editServiceDescription" name="description" rows="3" placeholder="Description" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm"></textarea>
+                <input type="text" id="editServiceCategory" name="category" placeholder="Category" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm">
+                <input type="number" id="editServicePrice" name="price" step="0.01" placeholder="Price" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm">
+                <input type="number" id="editServiceDuration" name="duration_minutes" placeholder="Duration (minutes)" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm">
+                <select id="editServiceStatus" name="is_active" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm">
+                    <option value="true">Active</option>
+                    <option value="false">Inactive</option>
+                </select>
+                <div class="flex gap-3 pt-3">
+                    <button type="submit" class="flex-1 bg-slate-900 text-white py-2 rounded-lg text-sm font-medium">Save</button>
+                    <button type="button" onclick="closeEditServiceModal()" class="flex-1 border border-slate-200 py-2 rounded-lg text-sm">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Force Action Modal for Bookings -->
+<div id="forceActionModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 modal-overlay">
+    <div class="bg-white rounded-xl shadow-xl max-w-md w-full mx-4 modal-content">
+        <div class="p-5">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold text-slate-800">Force Action on Booking</h3>
+                <button onclick="closeForceActionModal()" class="text-slate-400 hover:text-slate-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <p class="text-sm text-slate-600">Select force action for booking <span id="forceBookingId" class="font-semibold"></span></p>
+                <div class="flex gap-3">
+                    <button onclick="forceApproveBooking()" class="flex-1 bg-green-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition">
+                        Force Approve
+                    </button>
+                    <button onclick="forceCancelBooking()" class="flex-1 bg-red-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-red-700 transition">
+                        Force Cancel
+                    </button>
+                </div>
+                <button onclick="closeForceActionModal()" class="w-full border border-slate-200 py-2 rounded-lg text-sm">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/static/js/admin.js"></script>
+{% endblock %}
